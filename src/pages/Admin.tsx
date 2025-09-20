@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Admin = () => {
   const [loading, setLoading] = useState(false);
@@ -47,16 +46,15 @@ const Admin = () => {
         </div>
         <div>
           <Label>Editor</Label>
-          <Select value={form.editor} onValueChange={(value) => setForm({...form, editor: value})}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="capcut">CapCut</SelectItem>
-              <SelectItem value="vn">VN Video Editor</SelectItem>
-              <SelectItem value="aftereffects">After Effects</SelectItem>
-            </SelectContent>
-          </Select>
+          <select 
+            value={form.editor} 
+            onChange={(e) => setForm({...form, editor: e.target.value})}
+            className="w-full p-2 border rounded"
+          >
+            <option value="capcut">CapCut</option>
+            <option value="vn">VN Video Editor</option>
+            <option value="aftereffects">After Effects</option>
+          </select>
         </div>
         <div>
           <Label>Image URL</Label>

@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import TemplateDetail from "./pages/TemplateDetail";
+import Admin from "./pages/Admin";  // ADD THIS IMPORT
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/ProtectedRoute";
 

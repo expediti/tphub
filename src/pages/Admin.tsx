@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Admin = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +13,8 @@ const Admin = () => {
     description: '',
     thumbnail_url: '',
     video_preview_url: '',
-    capcut_url: ''
+    capcut_url: '',
+    editor: 'capcut'
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +26,7 @@ const Admin = () => {
       if (error) throw error;
       
       alert('Template uploaded! ✅');
-      setForm({ title: '', description: '', thumbnail_url: '', video_preview_url: '', capcut_url: '' });
+      setForm({ title: '', description: '', thumbnail_url: '', video_preview_url: '', capcut_url: '', editor: 'capcut' });
     } catch (error: any) {
       alert('Error: ' + error.message);
     }
@@ -44,6 +46,19 @@ const Admin = () => {
           <Textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} />
         </div>
         <div>
+          <Label>Editor</Label>
+          <Select value={form.editor} onValueChange={(value) => setForm({...form, editor: value})}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="capcut">CapCut</SelectItem>
+              <SelectItem value="vn">VN Video Editor</SelectItem>
+              <SelectItem value="aftereffects">After Effects</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
           <Label>Image URL</Label>
           <Input value={form.thumbnail_url} onChange={(e) => setForm({...form, thumbnail_url: e.target.value})} />
         </div>
@@ -52,7 +67,7 @@ const Admin = () => {
           <Input value={form.video_preview_url} onChange={(e) => setForm({...form, video_preview_url: e.target.value})} />
         </div>
         <div>
-          <Label>CapCut URL</Label>
+          <Label>Template URL</Label>
           <Input value={form.capcut_url} onChange={(e) => setForm({...form, capcut_url: e.target.value})} />
         </div>
         <Button type="submit" disabled={loading} className="w-full">

@@ -27,6 +27,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              <Route path="/admin" element={<Admin />} />
               <Route path="/" element={<Index />} />
               <Route path="/editors" element={<Editors />} />
               <Route path="/editors/:editor" element={<Editors />} />

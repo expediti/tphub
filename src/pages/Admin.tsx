@@ -35,18 +35,7 @@ const Admin = () => {
     setSuccess(false);
 
     try {
-      // Get CapCut editor ID
-      const { data: editor } = await supabase
-        .from('editors')
-        .select('id')
-        .eq('slug', 'capcut')
-        .single();
-
-      if (!editor) {
-        throw new Error('CapCut editor not found in database');
-      }
-
-      // Insert template into database
+      // Insert template WITHOUT editor lookup (simpler)
       const { data, error } = await supabase
         .from('templates')
         .insert({
@@ -57,7 +46,7 @@ const Admin = () => {
           preview_image_url: formData.thumbnailUrl,
           video_preview_url: formData.videoUrl,
           template_file_url: formData.capcutUrl,
-          editor_id: editor.id,
+          editor_id: null, // Skip editor lookup
           duration_seconds: formData.duration,
           is_published: true,
           is_featured: true
@@ -69,7 +58,7 @@ const Admin = () => {
       setSuccess(true);
       toast({
         title: 'Success! 🎉',
-        description: 'Template uploaded successfully and will appear on website!'
+        description: 'Template uploaded successfully!'
       });
 
       // Reset form
@@ -221,33 +210,8 @@ const Admin = () => {
                 )}
               </Button>
             </form>
-
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-semibold text-blue-900 mb-2">Quick Tips:</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Upload images/videos to Catbox.moe first</li>
-                <li>• Use direct catbox.moe file links</li>
-                <li>• Keep videos under 30 seconds for fast loading</li>
-                <li>• Test CapCut links before uploading</li>
-              </ul>
-            </div>
           </CardContent>
         </Card>
-
-        <div className="text-center mt-8">
-          <p className="text-muted-foreground">
-            After uploading, visit{' '}
-            <a 
-              href="https://tphub.vercel.app" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-primary hover:underline font-medium"
-            >
-              your website
-            </a>
-            {' '}to see the new template.
-          </p>
-        </div>
       </div>
     </div>
   );

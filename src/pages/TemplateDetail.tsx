@@ -3,28 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Download, Heart, Save, Share2, ArrowLeft, Play, Pause } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
-interface Template {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail_url: string;
-  video_preview_url: string;
-  capcut_url: string;
-  editor: string;
-  duration_seconds: number;
-  downloads_count: number;
-  likes_count: number;
-  created_at: string;
-}
-
 const TemplateDetail = () => {
   const { id } = useParams();
-  const [template, setTemplate] = useState<Template | null>(null);
+  const [template, setTemplate] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -42,7 +27,7 @@ const TemplateDetail = () => {
         if (error) throw error;
         setTemplate(data);
       } catch (error) {
-        console.error('Error fetching template:', error);
+        console.error('Error:', error);
       } finally {
         setLoading(false);
       }
@@ -52,31 +37,13 @@ const TemplateDetail = () => {
   }, [id]);
 
   const getEditorInfo = (editor: string) => {
-    switch (editor.toLowerCase()) {
-      case 'capcut':
-        return {
-          name: 'CapCut',
-          buttonText: 'Edit in CapCut',
-          color: 'bg-black text-white hover:bg-gray-800'
-        };
+    switch (editor?.toLowerCase()) {
       case 'vn':
-        return {
-          name: 'VN Video Editor',
-          buttonText: 'Edit in VN',
-          color: 'bg-blue-600 text-white hover:bg-blue-700'
-        };
+        return { name: 'VN Video Editor', buttonText: 'Edit in VN', color: 'bg-blue-600 hover:bg-blue-700' };
       case 'aftereffects':
-        return {
-          name: 'After Effects',
-          buttonText: 'Edit in AE',
-          color: 'bg-purple-600 text-white hover:bg-purple-700'
-        };
+        return { name: 'After Effects', buttonText: 'Edit in AE', color: 'bg-purple-600 hover:bg-purple-700' };
       default:
-        return {
-          name: 'CapCut',
-          buttonText: 'Edit in CapCut',
-          color: 'bg-black text-white hover:bg-gray-800'
-        };
+        return { name: 'CapCut', buttonText: 'Edit in CapCut', color: 'bg-black hover:bg-gray-800' };
     }
   };
 
@@ -175,11 +142,7 @@ const TemplateDetail = () => {
                     </div>
                   </>
                 ) : (
-                  <img
-                    src={template.thumbnail_url}
-                    alt={template.title}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={template.thumbnail_url} alt={template.title} className="w-full h-full object-cover" />
                 )}
               </div>
             </Card>
@@ -190,8 +153,8 @@ const TemplateDetail = () => {
             <div>
               <h1 className="text-3xl font-bold mb-2">{template.title}</h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                <Badge variant="secondary">{editorInfo.name}</Badge>
-                <span>Duration: {Math.floor(template.duration_seconds / 60)}:{(template.duration_seconds % 60).toString().padStart(2, '0')}</span>
+                <span className="px-2 py-1 bg-secondary rounded">{editorInfo.name}</span>
+                <span>Duration: {Math.floor((template.duration_seconds || 15) / 60)}:{((template.duration_seconds || 15) % 60).toString().padStart(2, '0')}</span>
               </div>
             </div>
 
@@ -202,13 +165,13 @@ const TemplateDetail = () => {
                   <h2 className="text-xl font-semibold">Free Download</h2>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Download className="mr-1 h-4 w-4" />
-                    {template.downloads_count.toLocaleString()}
+                    {(template.downloads_count || 0).toLocaleString()}
                   </div>
                 </div>
                 
                 <Button 
                   onClick={handleDownload}
-                  className={`w-full h-12 text-lg ${editorInfo.color}`}
+                  className={`w-full h-12 text-lg text-white ${editorInfo.color}`}
                 >
                   <Download className="mr-2 h-5 w-5" />
                   {editorInfo.buttonText}
@@ -217,7 +180,7 @@ const TemplateDetail = () => {
                 <div className="flex gap-2 mt-4">
                   <Button variant="outline" className="flex-1">
                     <Heart className="mr-2 h-4 w-4" />
-                    Like ({template.likes_count})
+                    Like ({template.likes_count || 0})
                   </Button>
                   <Button variant="outline" className="flex-1">
                     <Save className="mr-2 h-4 w-4" />
@@ -239,22 +202,6 @@ const TemplateDetail = () => {
                 </CardContent>
               </Card>
             )}
-
-            {/* Creator Info */}
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4">Creator</h3>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    T
-                  </div>
-                  <div>
-                    <div className="font-medium">Template Hub</div>
-                    <div className="text-sm text-muted-foreground">Template Creator</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

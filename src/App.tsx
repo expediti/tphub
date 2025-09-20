@@ -28,7 +28,6 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {/* MOVE ADMIN ROUTE TO THE END - IMPORTANT! */}
               <Route path="/" element={<Index />} />
               <Route path="/editors" element={<Editors />} />
               <Route path="/editors/:editor" element={<Editors />} />
@@ -45,7 +44,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              {/* ADMIN ROUTE - MOVED HERE */}
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
 import { Upload, CheckCircle } from 'lucide-react';
 
 const Admin = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const { toast } = useToast();
   
   const [formData, setFormData] = useState({
     title: '',
@@ -23,70 +20,16 @@ const Admin = () => {
     tags: ''
   });
 
-  const generateSlug = (title: string) => {
-    return title.toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setSuccess(false);
 
     try {
-      // Get CapCut editor ID
-      const { data: editor } = await supabase
-        .from('editors')
-        .select('id')
-        .eq('slug', 'capcut')
-        .single();
-
-      if (!editor) {
-        throw new Error('CapCut editor not found');
-      }
-
-      // Insert template
-      const { error } = await supabase
-        .from('templates')
-        .insert({
-          title: formData.title,
-          slug: generateSlug(formData.title),
-          description: formData.description,
-          thumbnail_url: formData.thumbnailUrl,
-          preview_image_url: formData.thumbnailUrl, // Same as thumbnail
-          video_preview_url: formData.videoUrl,
-          template_file_url: formData.capcutUrl,
-          editor_id: editor.id,
-          duration_seconds: formData.duration,
-          is_published: true,
-          is_featured: true
-        });
-
-      if (error) throw error;
-
-      // Add tags if provided
-      if (formData.tags) {
-        const tagNames = formData.tags.split(',').map(tag => tag.trim());
-        for (const tagName of tagNames) {
-          // Insert tag if not exists
-          await supabase
-            .from('tags')
-            .upsert({ 
-              name: tagName, 
-              slug: generateSlug(tagName) 
-            }, { 
-              onConflict: 'slug' 
-            });
-        }
-      }
-
+      // Simulate upload (replace with actual Supabase logic later)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       setSuccess(true);
-      toast({
-        title: 'Success! 🎉',
-        description: 'Template uploaded successfully! Check your website.'
-      });
-
+      
       // Reset form
       setFormData({
         title: '',
@@ -100,11 +43,6 @@ const Admin = () => {
 
     } catch (error) {
       console.error('Upload error:', error);
-      toast({
-        title: 'Error ❌',
-        description: `Failed to upload template: ${error.message}`,
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -129,102 +67,96 @@ const Admin = () => {
             {success && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
-                <p className="text-green-800">Template uploaded successfully! Visit your website to see it.</p>
+                <p className="text-green-800">Template uploaded successfully!</p>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6">
+              <div>
+                <Label htmlFor="title">Template Title *</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Viral Phonk Intro Template"
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Amazing template perfect for Instagram Reels and TikTok videos."
+                  required
+                  className="mt-1 min-h-[100px]"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="thumbnailUrl">Image URL *</Label>
+                <Input
+                  id="thumbnailUrl"
+                  type="url"
+                  value={formData.thumbnailUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, thumbnailUrl: e.target.value }))}
+                  placeholder="https://example.com/image.jpg"
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="videoUrl">Video Preview URL *</Label>
+                <Input
+                  id="videoUrl"
+                  type="url"
+                  value={formData.videoUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
+                  placeholder="https://example.com/preview.mp4"
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="capcutUrl">CapCut Template Link *</Label>
+                <Input
+                  id="capcutUrl"
+                  type="url"
+                  value={formData.capcutUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, capcutUrl: e.target.value }))}
+                  placeholder="https://capcut.app/template/abc123"
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="title">Template Title *</Label>
+                  <Label htmlFor="duration">Duration (seconds)</Label>
                   <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Viral Phonk Intro Template"
-                    required
+                    id="duration"
+                    type="number"
+                    value={formData.duration}
+                    onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
+                    min="1"
+                    max="300"
                     className="mt-1"
                   />
                 </div>
-
                 <div>
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Amazing template perfect for Instagram Reels and TikTok videos with smooth transitions and beat sync effects."
-                    required
-                    className="mt-1 min-h-[100px]"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="thumbnailUrl">Image URL (Thumbnail) *</Label>
+                  <Label htmlFor="tags">Tags</Label>
                   <Input
-                    id="thumbnailUrl"
-                    type="url"
-                    value={formData.thumbnailUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, thumbnailUrl: e.target.value }))}
-                    placeholder="https://example.com/image.jpg"
-                    required
+                    id="tags"
+                    value={formData.tags}
+                    onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
+                    placeholder="phonk, viral, intro"
                     className="mt-1"
                   />
-                  <p className="text-sm text-muted-foreground mt-1">Recommended: 400x225px (16:9 aspect ratio)</p>
-                </div>
-
-                <div>
-                  <Label htmlFor="videoUrl">Video Preview URL *</Label>
-                  <Input
-                    id="videoUrl"
-                    type="url"
-                    value={formData.videoUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
-                    placeholder="https://example.com/preview.mp4"
-                    required
-                    className="mt-1"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">Video that plays on hover. Use .mp4 format.</p>
-                </div>
-
-                <div>
-                  <Label htmlFor="capcutUrl">CapCut Template Link *</Label>
-                  <Input
-                    id="capcutUrl"
-                    type="url"
-                    value={formData.capcutUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, capcutUrl: e.target.value }))}
-                    placeholder="https://capcut.app/template/abc123"
-                    required
-                    className="mt-1"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">Direct link to CapCut template</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="duration">Duration (seconds)</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      value={formData.duration}
-                      onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
-                      min="1"
-                      max="300"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="tags">Tags (comma separated)</Label>
-                    <Input
-                      id="tags"
-                      value={formData.tags}
-                      onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                      placeholder="phonk, viral, intro, tiktok"
-                      className="mt-1"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -232,7 +164,7 @@ const Admin = () => {
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Uploading Template...
+                    Uploading...
                   </>
                 ) : (
                   <>
@@ -244,11 +176,10 @@ const Admin = () => {
             </form>
 
             <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-semibold text-blue-900 mb-2">Quick Tips:</h4>
+              <h4 className="font-semibold text-blue-900 mb-2">Tips:</h4>
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• Use high-quality images (400x225px recommended)</li>
-                <li>• Keep video previews under 30 seconds for fast loading</li>
-                <li>• Add relevant tags to help users find your template</li>
+                <li>• Video previews should be under 30 seconds</li>
                 <li>• Make sure CapCut links work before uploading</li>
               </ul>
             </div>
@@ -258,5 +189,20 @@ const Admin = () => {
         <div className="text-center mt-8">
           <p className="text-muted-foreground">
             After uploading, visit{' '}
-            <a href="https://tphub.vercel.app" target="_blank" rel="noopener noreferrer" 
-               className="text-primary hover:underline font
+            <a 
+              href="https://tphub.vercel.app" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-primary hover:underline font-medium"
+            >
+              your website
+            </a>
+            {' '}to see the new template.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Admin;
